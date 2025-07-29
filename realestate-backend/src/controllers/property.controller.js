@@ -40,3 +40,43 @@ exports.getAllProperties = async (req, res) => {
   const properties = await Property.find().populate("landlord", "fullName email");
   res.json(properties);
 };
+
+//update property by id
+exports.updateProperty = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, address, price } = req.body;
+
+    const updatedProperty = await Property.findByIdAndUpdate(
+      id,
+      { title, description, address, price },
+      { new: true }
+    );
+
+    if (!updatedProperty) {
+      return res.status(404).json({ error: "Property not found" });
+    }
+
+    res.status(200).json(updatedProperty);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update property" });
+  }
+}
+
+exports.getPropertyById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const property = await Property.findById(id).populate("landlord", "fullName email");
+
+    if (!property) {
+      return res.status(404).json({ error: "Property not found" });
+    }
+
+    res.status(200).json(property);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch property" });
+  }
+}
