@@ -11,17 +11,19 @@ router.post(
   protect,
   restrictTo("landlord"),
   upload.array("images", 5),
+  enforceLagosTenancyLaw,
   PropertyController.createProperty
 );
-router.patch(
+router.put(
   "/:id",
   protect,
   restrictTo("landlord"),
+  upload.array("images", 5),
   enforceLagosTenancyLaw,
   PropertyController.updateProperty
 );
-
-router.get("/", enforceLagosTenancyLaw, PropertyController.getAllProperties);
-router.get("/:id", enforceLagosTenancyLaw, PropertyController.getPropertyById);
+router.delete("/:id", protect, restrictTo("landlord"), PropertyController.deleteProperty);
+router.get("/", PropertyController.getAllProperties);
+router.get("/:id", PropertyController.getPropertyById);
 
 module.exports = router;

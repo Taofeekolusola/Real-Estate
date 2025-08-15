@@ -1,37 +1,76 @@
-// middlewares/enforceLagosTenancyLaw.js
+const ViolationLog = require("../models/Violation");
 
-const MAX_YEARLY_RENT = 5_000_000; // N5M cap (adjust as needed)
+const MAX_ANNUAL_RENT = 10000000; // ₦3,000,000
+const MAX_PERCENTAGE_FEES = 0.1; // 10%
 
-module.exports = function enforceLagosTenancyLaw(req, res, next) {
-  const { rentAmount, paymentOptions, agencyFee, legalFee, agreementUrl } = req.body;
+module.exports = async function enforceLagosTenancyLaw(req, res, next) {
+  const {
+    rentAmount,
+    paymentOptions,
+    agencyFee = 0,
+    legalFee = 0,
+    agreementUrl,
+  } = req.body;
 
-  // 1. Enforce Rent Cap by Payment Frequency
-  if (paymentOptions === "yearly" && rentAmount > MAX_YEARLY_RENT) {
-    return res.status(400).json({
-      error: "Rent exceeds legal limit for yearly payment in Lagos.",
+  const landlordId = req.user._id;
+
+  const monthlyRent =
+    paymentOptions === "monthly"
+      ? rentAmount
+      : paymentOptions === "quarterly"
+      ? rentAmount / 3
+      : rentAmount / 12;
+
+  const annualRent = monthlyRent * 12;
+
+  let violations = [];
+
+  if (annualRent > MAX_ANNUAL_RENT) {
+    violations.push({
+      reason: "Rent exceeds Lagos tenancy cap",
+      detail: `Annualized rent is ₦${annualRent}, max allowed is ₦${MAX_ANNUAL_RENT}`,
     });
   }
 
-  if (paymentOptions === "monthly" && rentAmount * 12 > MAX_YEARLY_RENT) {
-    return res.status(400).json({
-      error: "Monthly payments exceed Lagos legal annual rent limit.",
+  const maxFee = rentAmount * MAX_PERCENTAGE_FEES;
+
+  if (agencyFee > maxFee) {
+    violations.push({
+      reason: "Agency fee exceeds 10% of rent",
+      detail: `Agency fee is ₦${agencyFee}, max allowed is ₦${maxFee}`,
     });
   }
 
-  // 2. Cap Legal & Agency Fees at 10%
-  const maxFee = rentAmount * 0.1;
-  if (agencyFee > maxFee || legalFee > maxFee) {
-    return res.status(400).json({
-      error: "Agency or legal fees exceed 10% of rent as allowed by law.",
+  if (legalFee > maxFee) {
+    violations.push({
+      reason: "Legal fee exceeds 10% of rent",
+      detail: `Legal fee is ₦${legalFee}, max allowed is ₦${maxFee}`,
     });
   }
 
-  // 3. Rental Agreement Required
-  if (!agreementUrl || agreementUrl.trim() === "") {
-    return res.status(400).json({
-      error: "Rental agreement document is required to publish a listing.",
+  if (!agreementUrl || typeof agreementUrl !== "string") {
+    violations.push({
+      reason: "Missing tenancy agreement",
+      detail: "Every rental must have an agreement URL",
     });
   }
 
-  next(); // All validations passed
+  if (violations.length > 0) {
+    const violationEntries = violations.map((v) => ({
+      landlord: landlordId,
+      property: null,
+      reason: v.reason,
+      details: v,
+    }));
+
+    await ViolationLog.insertMany(violationEntries);
+
+    return res.status(400).json({
+      status: "error",
+      message: "Your property violates Lagos Tenancy Law.",
+      violations,
+    });
+  }
+
+  next();
 };

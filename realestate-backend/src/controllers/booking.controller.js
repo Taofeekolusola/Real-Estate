@@ -63,7 +63,7 @@ exports.updateBookingStatus = async (req, res) => {
 
     if (status === 'approved') {
       const tenantEmail = booking.tenant.email;
-      const tenantName = booking.tenant.firstName;
+      const tenantName = booking.tenant.name;
       const propertyTitle = booking.property.title;
 
       const payLink = `${process.env.CLIENT_BASE_URL}/pay?bookingId=${booking._id}`;

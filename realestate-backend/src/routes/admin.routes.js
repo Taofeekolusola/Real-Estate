@@ -15,7 +15,7 @@ router.get("/properties", adminController.getAllProperties);
 
 router.patch("/properties/:id/approve", adminController.approveProperty);
 
-router.patch("/properties/:id/rent-fee", adminController.enforceRentFee);
+// router.patch("/properties/:id/rent-fee", adminController.enforceRentFee);
 
 router.get("/all", adminController.getAllDisputes);
 

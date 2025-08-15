@@ -64,26 +64,26 @@ exports.approveProperty = async (req, res) => {
 };
 
 // Enforce rent fee on a property
-exports.enforceRentFee = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { rentFee } = req.body;
+// exports.enforceRentFee = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const { rentFee } = req.body;
 
-    if (typeof rentFee !== "number" || rentFee <= 0) {
-      return res.status(400).json({ error: "Invalid rent fee value" });
-    }
+//     if (typeof rentFee !== "number" || rentFee <= 0) {
+//       return res.status(400).json({ error: "Invalid rent fee value" });
+//     }
 
-    const property = await Property.findByIdAndUpdate(id, { rentFee }, { new: true });
+//     const property = await Property.findByIdAndUpdate(id, { rentFee }, { new: true });
 
-    if (!property) {
-      return res.status(404).json({ error: "Property not found" });
-    }
+//     if (!property) {
+//       return res.status(404).json({ error: "Property not found" });
+//     }
 
-    res.status(200).json({ message: "Rent fee enforced", property });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to enforce rent fee" });
-  }
-};
+//     res.status(200).json({ message: "Rent fee enforced", property });
+//   } catch (err) {
+//     res.status(500).json({ error: "Failed to enforce rent fee" });
+//   }
+// };
 
 // Admin: Get all disputes
 exports.getAllDisputes = async (req, res) => {

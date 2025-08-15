@@ -1,5 +1,4 @@
 // services/verify.js
-
 exports.verifyNIN = async (nin) => {
   // Simulate NIN verification with mock logic
   if (nin && nin.length === 11) {

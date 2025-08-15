@@ -74,3 +74,60 @@ exports.login = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// Get user profile
+exports.getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Update user profile
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, phone, nin, bvn } = req.body;
+
+    // Verify NIN
+    if (nin) {
+      const ninResult = await verifyNIN(nin);
+      if (!ninResult.isValid) {
+        return res.status(400).json({ message: ninResult.error });
+      }
+    }
+
+    // Verify BVN
+    if (bvn) {
+      const bvnResult = await verifyBVN(bvn);
+      if (!bvnResult.isValid) {
+        return res.status(400).json({ message: bvnResult.error });
+      }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, phone, nin, bvn },
+      { new: true }
+    ).select("-password");
+
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+// Delete user account
+exports.deleteAccount = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "Account deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
