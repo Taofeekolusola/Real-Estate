@@ -3,6 +3,7 @@ const ViolationLog = require("../models/Violation");
 const MAX_ANNUAL_RENT = 10000000; // ₦3,000,000
 const MAX_PERCENTAGE_FEES = 0.1; // 10%
 
+
 module.exports = async function enforceLagosTenancyLaw(req, res, next) {
   const {
     rentAmount,

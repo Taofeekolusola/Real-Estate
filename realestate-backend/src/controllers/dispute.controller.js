@@ -33,3 +33,20 @@ exports.getUserDisputes = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Delete a dispute
+exports.deleteDispute = async (req, res) => {
+  try {
+    const { disputeId } = req.params;
+
+    const dispute = await Dispute.findByIdAndDelete(disputeId);
+
+    if (!dispute) {
+      return res.status(404).json({ success: false, message: "Dispute not found" });
+    }
+
+    res.status(200).json({ success: true, message: "Dispute deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}

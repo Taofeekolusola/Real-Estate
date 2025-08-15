@@ -1,7 +1,6 @@
 // utils/mailer.js
 const nodemailer = require('nodemailer');
 const fs = require('fs');
-require('dotenv').config();
 
 const sendEmail = async ({ to, subject, html }) => {
   if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {

@@ -1,6 +1,4 @@
 // testMailer.js
-require("dotenv").config();
-
 const sendEmail = require("./src/utils/mailer");
 
 sendEmail({

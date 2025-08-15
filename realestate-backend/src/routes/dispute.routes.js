@@ -9,4 +9,7 @@ router.post("/", protect, disputeController.createDispute);
 // User: Get their own disputes
 router.get("/", protect, disputeController.getUserDisputes);
 
+//delete dispute
+router.delete("/:disputeId", protect, disputeController.deleteDispute);
+
 module.exports = router;

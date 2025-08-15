@@ -86,3 +86,21 @@ exports.updateBookingStatus = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+// Cancel a booking
+exports.cancelBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const booking = await Booking.findByIdAndDelete(id);
+
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    res.status(200).json({ message: 'Booking cancelled successfully' });
+  } catch (error) {
+    console.error('Cancel booking error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
