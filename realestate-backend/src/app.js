@@ -55,7 +55,6 @@ app.use("/api/ratings", ratingRoutes);
 const verifyRoutes = require("./routes/verify.routes");
 app.use("/api/verify", verifyRoutes);
 
-
 app.get("/", (req, res) => res.send("API is running..."));
 
 module.exports = app;
