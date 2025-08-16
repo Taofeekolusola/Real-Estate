@@ -41,7 +41,7 @@ exports.getRatingsForLandlord = async (req, res) => {
   }
 };
 
-// Get ratings by tenant
+// Get ratings by a particular tenant
 exports.getRatingsByTenant = async (req, res) => {
   try {
     const ratings = await Rating.find({ tenant: req.user._id })
@@ -54,7 +54,7 @@ exports.getRatingsByTenant = async (req, res) => {
   }
 }
 
-// Delete a rating
+//Tenant and Admin Delete a rating
 exports.deleteRating = async (req, res) => {
   try {
     const { id } = req.params;

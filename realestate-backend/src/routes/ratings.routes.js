@@ -9,10 +9,10 @@ router.post("/", protect, restrictTo("tenant"), RatingController.createRating);
 //get all ratings for a landlord
 router.get("/:landlordId", RatingController.getRatingsForLandlord);
 
-//grt all ratings for a tenant
+//get all ratings for a tenant
 router.get("/tenant/:tenantId", protect, restrictTo("landlord"), RatingController.getRatingsByTenant);
 
-//delete rating
+// Tenant and Admin delete rating 
 router.delete("/:id", protect, restrictTo("tenant"), RatingController.deleteRating);
 
 module.exports = router;

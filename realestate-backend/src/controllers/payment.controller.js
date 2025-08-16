@@ -4,6 +4,8 @@ const Booking = require("../models/Booking");
 const Property = require("../models/Property");
 const generateAgreement = require("../utils/generateAgreement");
 const { sendEmailWithPdf } = require("../utils/mailer");
+const dotenv = require("dotenv");
+dotenv.config();
 
 exports.initializePayment = async (req, res) => {
   try {

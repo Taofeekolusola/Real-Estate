@@ -15,7 +15,7 @@ router.get("/landlord", protect, restrictTo("landlord"), BookingController.getBo
 // Landlord: approve/reject booking
 router.patch("/:id/status", protect, restrictTo("landlord"), BookingController.updateBookingStatus);
 
-//cancel booking
+//Tenant cancel booking
 router.delete("/:id", protect, restrictTo("tenant"), BookingController.cancelBooking);
 
 module.exports = router;

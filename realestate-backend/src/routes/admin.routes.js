@@ -23,7 +23,7 @@ router.put("/:id/assign", adminController.assignMediator);
 
 router.put("/:id/status", adminController.updateDisputeStatus);
 
-//delete dispute
+//Admin deletes dispute
 router.delete("/:id", adminController.deleteDispute);
 
 

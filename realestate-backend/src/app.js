@@ -4,6 +4,8 @@ const morgan = require("morgan");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const sanitizeBody = require("./middlewares/sanitize");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const app = express();
 

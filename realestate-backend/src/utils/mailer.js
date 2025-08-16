@@ -1,5 +1,7 @@
 // utils/mailer.js
 const nodemailer = require('nodemailer');
+const dotenv = require("dotenv");
+dotenv.config();
 const fs = require('fs');
 
 const sendEmail = async ({ to, subject, html }) => {
