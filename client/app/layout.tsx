@@ -11,28 +11,25 @@ export const metadata: Metadata = {
   generator: "v0.app",
 }
 
+// ✅ Fonts must be defined at module scope
+const geistSans = GeistSans
+const geistMono = GeistMono
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>
         <meta
           httpEquiv="Content-Security-Policy"
           content="frame-ancestors 'self' https://checkout.paystack.com https://js.paystack.co;"
         />
         <meta name="referrer" content="origin-when-cross-origin" />
-        <style>{`
-html {
-  font-family: ${GeistSans.style.fontFamily};
-  --font-sans: ${GeistSans.variable};
-  --font-mono: ${GeistMono.variable};
-}
-        `}</style>
       </head>
-      <body>
+      <body className="font-sans">
         <ReduxProvider>{children}</ReduxProvider>
       </body>
     </html>
