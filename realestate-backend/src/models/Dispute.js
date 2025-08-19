@@ -8,7 +8,7 @@ const disputeSchema = new mongoose.Schema(
     description: { type: String, required: true },
     status: {
       type: String,
-      enum: ["pending", "in-review", "resolved", "rejected"],
+      enum: ["pending", "in-progress", "resolved", "rejected"],
       default: "pending",
     },
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // mediator/admin

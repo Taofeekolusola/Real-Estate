@@ -116,7 +116,7 @@ exports.assignMediator = async (req, res) => {
     }
 
     dispute.assignedTo = assignedTo;
-    dispute.status = "in-review";
+    dispute.status = "in-progress";
     await dispute.save();
 
     res.status(200).json({ success: true, message: "Mediator assigned", dispute });
@@ -157,9 +157,9 @@ exports.updateDisputeStatus = async (req, res) => {
 // Delete a dispute
 exports.deleteDispute = async (req, res) => {
   try {
-    const { disputeId } = req.params;
+    const { id } = req.params;
 
-    const dispute = await Dispute.findByIdAndDelete(disputeId);
+    const dispute = await Dispute.findByIdAndDelete(id);
 
     if (!dispute) {
       return res.status(404).json({ success: false, message: "Dispute not found" });
