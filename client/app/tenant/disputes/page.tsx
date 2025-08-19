@@ -47,6 +47,10 @@ export default function TenantDisputesPage() {
         return "default"
       case "in-progress":
         return "secondary"
+      case "pending":
+        return "warning"
+      case "rejected":
+        return "destructive"
       default:
         return "destructive"
     }
