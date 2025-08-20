@@ -27,7 +27,7 @@ export default function PropertiesPage() {
   }, [dispatch])
 
   const filteredProperties = (properties || []).filter((property) => {
-    const isApproved = property.status === "approved" || property.approved === true
+    const isApproved = property.status === "approved" === true
 
     const matchesSearch =
       property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
