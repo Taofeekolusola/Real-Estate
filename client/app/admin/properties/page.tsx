@@ -216,23 +216,24 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Building, Check, Clock, X } from "lucide-react"
 import { toast } from "sonner"
+import { Property as IProperty } from "@/types"
 
 // Define types
-interface ILandlord {
-  _id: string
-  name: string
-  email: string
-}
+// interface ILandlord {
+//   _id: string
+//   name: string
+//   email: string
+// }
 
-interface IProperty {
-  _id: string
-  title: string
-  address: string
-  rentAmount: number
-  approved?: boolean
-  status?: "pending" | "approved" | "rejected" | string
-  landlord?: ILandlord | string
-}
+// interface IProperty {
+//   _id: string
+//   title: string
+//   address: string
+//   rentAmount: number
+//   approved?: boolean
+//   status?: "pending" | "approved" | "rejected" | string
+//   landlord?: ILandlord | string
+// }
 
 export default function AdminProperties() {
   const dispatch = useAppDispatch()

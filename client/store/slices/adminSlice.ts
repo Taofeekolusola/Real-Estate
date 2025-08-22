@@ -358,6 +358,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "@/lib/api";
 
+
 interface User {
   _id: string;
   name: string;
@@ -378,6 +379,7 @@ interface AdminProperty {
     _id: string;
     name: string;
     email: string;
+    role: "landlord";
   };
   createdAt: string;
   approved?: boolean;
@@ -391,20 +393,22 @@ interface AdminDispute {
     _id: string;
     name: string;
     email: string;
+    role: "tenant" | "landlord"
   };
   againstUser: {
     _id: string;
     name: string;
     email: string;
+    role: "tenant" | "landlord"
   };
-  property: {
-    _id: string;
-    title: string;
-  };
-  assignedTo?: {
+  property: AdminProperty;
+  assignedTo: {
     _id: string;
     name: string;
+    email: string;
+    role: "admin";
   };
+
   resolutionNote?: string;
   createdAt: string;
 }

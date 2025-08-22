@@ -2,12 +2,12 @@ export interface User {
   _id: string
   name: string
   email: string
-  phone: string
+  phone?: string
   role: "tenant" | "landlord" | "admin"
-  nin: string
-  bvn: string
+  nin?: string
+  bvn?: string
   status?: "active" | "suspended"
-  createdAt: string
+  createdAt?: string
 }
 
 export interface AuthState {
@@ -20,16 +20,17 @@ export interface AuthState {
 export interface Property {
   _id: string
   title: string
-  description: string
+  description?: string
   address: string
   rentAmount: number
-  paymentOptions: string[]
-  agencyFee: number
-  legalFee: number
+  paymentOptions?: string[]
+  agencyFee?: number
+  legalFee?: number
   agreementUrl?: string
-  durationInMonths: number
-  images: string[]
-  landlord: User
+  durationInMonths?: number
+  images?: string[]
+  landlord?: User
+  approved?: boolean
   status: "pending" | "approved" | "rejected"
   createdAt: string
 }

@@ -370,23 +370,24 @@ import {
 } from "@/components/ui/alert-dialog"
 import Link from "next/link"
 import { MapPin, User, MessageSquare, Eye, Clock, Check, X, Phone, Mail } from "lucide-react"
+import { Booking as IBooking } from "@/types"
 
-interface IBooking {
-  _id: string
-  status: "pending" | "approved" | "rejected"
-  message: string
-  createdAt: string
-  tenant: {
-    name: string
-    email: string
-    phone: string
-  }
-  property: {
-    _id: string
-    title: string
-    address: string
-  }
-}
+// interface IBooking {
+//   _id: string
+//   status: "pending" | "approved" | "rejected"
+//   message: string
+//   createdAt: string
+//   tenant: {
+//     name: string
+//     email: string
+//     phone: string
+//   }
+//   property: {
+//     _id: string
+//     title: string
+//     address: string
+//   }
+// }
 
 export default function LandlordBookingsPage() {
   const dispatch = useAppDispatch()

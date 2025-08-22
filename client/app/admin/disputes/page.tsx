@@ -420,28 +420,33 @@ import {
   Trash2,
 } from "lucide-react"
 import { toast } from "sonner"
+// import dispute and user types
+import { Dispute as IDispute } from "@/types"
 
-// Define proper types
-interface IUser {
-  _id: string
-  name: string
-  email: string
-  role: string
-}
+// type UserRole = "tenant" | "landlord" | "admin";
+// type DisputeStatus = "pending" | "in-progress" | "resolved"
 
-interface IDispute {
-  _id: string
-  description: string
-  property?: {
-    title: string
-  }
-  createdBy?: IUser
-  againstUser?: IUser
-  assignedTo?: IUser
-  status: "pending" | "in-progress" | "resolved" | string
-  resolutionNote?: string
-  createdAt: string
-}
+// // Define proper types
+// interface IUser {
+//   _id: string
+//   name: string
+//   email: string
+//   role: UserRole
+// }
+
+// interface IDispute {
+//   _id: string
+//   description: string
+//   property: {
+//     title: string
+//   }
+//   createdBy: IUser
+//   againstUser: IUser
+//   assignedTo: IUser
+//   status: DisputeStatus
+//   resolutionNote?: string
+//   createdAt: string
+// }
 
 export default function AdminDisputes() {
   const dispatch = useAppDispatch()

@@ -233,15 +233,16 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Users, UserCheck, UserX } from "lucide-react"
 import { toast } from "sonner"
+import { User as IUser} from "@/types"
 
-interface IUser {
-  _id: string
-  name: string
-  email: string
-  phone?: string
-  role: "tenant" | "landlord" | "admin"
-  status: "active" | "suspended"
-}
+// interface IUser {
+//   _id: string
+//   name: string
+//   email: string
+//   phone?: string
+//   role: "tenant" | "landlord" | "admin"
+//   status: "active" | "suspended"
+// }
 
 export default function AdminUsers() {
   const dispatch = useAppDispatch()
