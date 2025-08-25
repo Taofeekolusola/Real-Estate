@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { CheckCircle, XCircle, Loader2, ArrowRight } from "lucide-react"
+import { Payment } from "@/types"
 
 export default function PaymentVerificationPage() {
   const router = useRouter()
@@ -20,23 +21,24 @@ export default function PaymentVerificationPage() {
   const reference = searchParams.get("reference")
 
   useEffect(() => {
-    if (reference) {
-      dispatch(verifyPayment(reference))
-        .unwrap()
-        .then((result) => {
-          if (result.payment && result.payment.status === "success") {
-            setVerificationStatus("success")
-          } else {
-            setVerificationStatus("failed")
-          }
-        })
-        .catch(() => {
+  if (reference) {
+    dispatch(verifyPayment(reference))
+      .unwrap()
+      .then((result: { payment?: Payment }) => {
+        if (result.payment && result.payment.status === "success") {
+          setVerificationStatus("success")
+        } else {
           setVerificationStatus("failed")
-        })
-    } else {
-      setVerificationStatus("failed")
-    }
-  }, [reference, dispatch])
+        }
+      })
+      .catch(() => {
+        setVerificationStatus("failed")
+      })
+  } else {
+    setVerificationStatus("failed")
+  }
+}, [reference, dispatch])
+
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-NG", {

@@ -13,7 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { ArrowLeft, CreditCard, Shield, CheckCircle, MapPin, User, Calendar } from "lucide-react"
-
+import { Booking } from "@/types"
 export default function PaymentPage() {
   const params = useParams()
   const router = useRouter()
@@ -27,7 +27,7 @@ export default function PaymentPage() {
   const [useManualAmount, setUseManualAmount] = useState(false)
 
   const bookingId = params.id as string
-  const booking = bookings.find((b) => b._id === bookingId)
+  const booking = bookings.find((b: Booking) => b._id === bookingId)
 
   useEffect(() => {
     if (bookings.length === 0) {

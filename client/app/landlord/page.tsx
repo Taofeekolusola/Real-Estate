@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { PropertyCard } from "@/components/property/property-card"
 import { Building2, Plus, Eye, Calendar, DollarSign } from "lucide-react"
+import { Property } from "@/types"
 
 export default function LandlordDashboard() {
   const dispatch = useAppDispatch()
@@ -20,18 +21,18 @@ export default function LandlordDashboard() {
     dispatch(fetchProperties())
   }, [dispatch])
 
-  const myProperties = (properties || []).filter((property) => {
+  const myProperties = (properties || []).filter((property: Property) => {
     const landlordId = typeof property.landlord === "string" ? property.landlord : property.landlord?._id
     return landlordId === user?._id
   })
 
   const approvedProperties = myProperties.filter(
-    (property) => property.status === "approved" || property.approved === true,
+    (property: Property) => property.status === "approved" || property.approved === true,
   )
   const pendingProperties = myProperties.filter(
-    (property) => property.status === "pending" || property.approved === false,
+    (property: Property) => property.status === "pending" || property.approved === false,
   )
-  const totalRentValue = myProperties.reduce((sum, property) => sum + property.rentAmount, 0)
+  const totalRentValue = myProperties.reduce((sum: number, property: Property) => sum + property.rentAmount, 0)
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-NG", {
@@ -163,7 +164,7 @@ export default function LandlordDashboard() {
               </div>
             ) : myProperties.length > 0 ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {myProperties.slice(0, 6).map((property) => (
+                {myProperties.slice(0, 6).map((property: Property) => (
                   <PropertyCard key={property._id} property={property} />
                 ))}
               </div>

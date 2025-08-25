@@ -103,7 +103,7 @@ export default function PropertyDetailPage() {
         {/* Property Images */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           {property.images && property.images.length > 0 ? (
-            property.images.map((image, index) => (
+            property.images.map((image: string, index: number) => (
               <div key={index} className="relative h-64 bg-gray-200 rounded-lg overflow-hidden">
                 <img
                   src={image || "/placeholder.svg"}
@@ -172,7 +172,7 @@ export default function PropertyDetailPage() {
 
                     // If it's already an array, use it directly
                     if (Array.isArray(property.paymentOptions)) {
-                      return property.paymentOptions.map((option, index) => (
+                      return property.paymentOptions.map((option: string, index: number) => (
                         <Badge key={index} variant="outline">
                           {option}
                         </Badge>

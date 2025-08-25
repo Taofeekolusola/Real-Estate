@@ -9,6 +9,7 @@ import { PropertyFilters } from "@/components/property/property-filters"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, SlidersHorizontal } from "lucide-react"
+import { Property } from "@/types"
 
 export default function PropertiesPage() {
   const dispatch = useAppDispatch()
@@ -26,7 +27,7 @@ export default function PropertiesPage() {
     dispatch(fetchProperties())
   }, [dispatch])
 
-  const filteredProperties = (properties || []).filter((property) => {
+  const filteredProperties = (properties || []).filter((property: Property) => {
     const isApproved = property.status === "approved" === true
 
     const matchesSearch =
@@ -89,7 +90,7 @@ export default function PropertiesPage() {
           </div>
         ) : filteredProperties.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProperties.map((property) => (
+            {filteredProperties.map((property: Property) => (
               <PropertyCard key={property._id} property={property} />
             ))}
           </div>

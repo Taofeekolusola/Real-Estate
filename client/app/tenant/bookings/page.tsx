@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import Link from "next/link"
 import { Calendar, MapPin, User, MessageSquare, Eye, Clock, CreditCard, X } from "lucide-react"
 import { toast } from "sonner"
+import { Booking } from "@/types"
 
 export default function TenantBookingsPage() {
   const dispatch = useAppDispatch()
@@ -89,7 +90,7 @@ export default function TenantBookingsPage() {
             </div>
           ) : (bookings || []).length > 0 ? (
             <div className="space-y-6">
-              {(bookings || []).map((booking) => (
+              {(bookings || []).map((booking: Booking) => (
                 <Card key={booking._id}>
                   <CardHeader>
                     <div className="flex items-start justify-between">
