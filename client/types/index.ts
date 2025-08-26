@@ -88,6 +88,6 @@ export interface RegisterData {
   phone: string
   password: string
   role: "tenant" | "landlord"
-  nin: string
-  bvn: string
+  // nin: string
+  // bvn: string
 }
