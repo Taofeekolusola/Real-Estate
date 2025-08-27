@@ -164,7 +164,7 @@ export default function RegisterPage() {
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="bg-gray-300 text-white placeholder-gray-400"
+                      className="bg-gray-700 text-white placeholder-gray-400"
                     />
                   </div>
                   <div className="space-y-2">
@@ -176,7 +176,7 @@ export default function RegisterPage() {
                       value={formData.phone}
                       onChange={handleChange}
                       required
-                      className="bg-gray-300 text-white placeholder-gray-400"
+                      className="bg-gray-700 text-white placeholder-gray-400"
                     />
                   </div>
                 </div>
@@ -191,7 +191,7 @@ export default function RegisterPage() {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="bg-gray-300 text-white placeholder-gray-400"
+                    className="bg-gray-700 text-white placeholder-gray-400"
                   />
                 </div>
 
@@ -206,7 +206,7 @@ export default function RegisterPage() {
                       value={formData.password}
                       onChange={handleChange}
                       required
-                      className="bg-gray-300 text-white placeholder-gray-400"
+                      className="bg-gray-700 text-white placeholder-gray-400"
                     />
                     <Button
                       type="button"
@@ -235,7 +235,7 @@ export default function RegisterPage() {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       required
-                      className="bg-gray-300 text-white placeholder-gray-400"
+                      className="bg-gray-700 text-white placeholder-gray-400"
                     />
                     <Button
                       type="button"
