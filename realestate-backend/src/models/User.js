@@ -7,8 +7,8 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    nin: { type: String },
-    bvn: { type: String },
+    // nin: { type: String },
+    // bvn: { type: String },
     role: {
       type: String,
       enum: ["tenant", "landlord", "admin"],
