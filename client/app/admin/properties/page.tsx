@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Building, Check, Clock, X } from "lucide-react"
 import { toast } from "sonner"
-// import { Property as IProperty } from "@/types"
 
 export default function AdminProperties() {
   const dispatch = useAppDispatch()
@@ -28,7 +27,8 @@ export default function AdminProperties() {
     try {
       await dispatch(approveProperty(propertyId)).unwrap()
       toast.success("Property approved successfully")
-    } catch {
+    } catch (error) {
+      console.error("Failed to approve property:", error)
       toast.error("Failed to approve property")
     }
   }
@@ -36,22 +36,21 @@ export default function AdminProperties() {
   const filteredProperties = (properties || []).filter((property) => {
     const title = property.title || ""
     const address = property.address || ""
-    const landlordName =
-      typeof property.landlord === "object" ? property.landlord?.name || "" : ""
+    const landlordName = typeof property.landlord === "object" ? property.landlord?.name || "" : ""
 
     const matchesSearch =
       title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       address.toLowerCase().includes(searchTerm.toLowerCase()) ||
       landlordName.toLowerCase().includes(searchTerm.toLowerCase())
 
-    const propertyStatus = property.status || (property.approved ? "approved" : "pending")
-    const matchesStatus = statusFilter === "all" || propertyStatus === statusFilter
+    const status = property.status || (property.approved ? "approved" : "pending")
+    const matchesStatus = statusFilter === "all" || status === statusFilter
 
     return matchesSearch && matchesStatus
   })
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { color: string; icon: typeof Clock; text: string }> = {
+    const statusConfig: Record<string, { color: string; icon: any; text: string }> = {
       pending: { color: "bg-yellow-100 text-yellow-800", icon: Clock, text: "Pending" },
       approved: { color: "bg-green-100 text-green-800", icon: Check, text: "Approved" },
       rejected: { color: "bg-red-100 text-red-800", icon: X, text: "Rejected" },
@@ -78,7 +77,6 @@ export default function AdminProperties() {
         <Navbar />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Property Management</h1>
             <p className="text-gray-600">Review and approve property listings</p>
@@ -149,7 +147,7 @@ export default function AdminProperties() {
                   {filteredProperties.map((property) => (
                     <div
                       key={property._id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg hover:bg-gray-50 gap-4"
                     >
                       <div className="flex items-center space-x-4">
                         <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -162,28 +160,31 @@ export default function AdminProperties() {
                           </div>
                           <p className="text-sm text-gray-600 mb-1">{property.address}</p>
                           <p className="text-sm text-gray-500">
-                            Landlord:{" "}
-                            {typeof property.landlord === "object"
+                            Landlord: {typeof property.landlord === "object"
                               ? `${property.landlord?.name || "Unknown"} (${property.landlord?.email || "No email"})`
                               : "Landlord ID: " + property.landlord}
                           </p>
                           <p className="text-sm font-semibold text-green-600">
-                            ₦{property.rentAmount.toLocaleString()}/month
+                            ₦{property.rentAmount?.toLocaleString() || 0}/month
                           </p>
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-2">
+                      <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                         {(property.status === "pending" || (!property.status && !property.approved)) && (
                           <Button
                             onClick={() => handleApproveProperty(property._id)}
-                            className="bg-green-600 hover:bg-green-700"
+                            className="bg-green-600 hover:bg-green-700 flex-1 sm:flex-none"
                           >
                             <Check className="h-4 w-4 mr-1" />
                             Approve
                           </Button>
                         )}
-                        <Button variant="outline" size="sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 sm:flex-none"
+                        >
                           View Details
                         </Button>
                       </div>

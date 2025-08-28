@@ -53,21 +53,21 @@ export default function AdminDashboard() {
 
   return (
     <AuthGuard allowedRoles={["admin"]}>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden">
         <Navbar />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
             <p className="text-gray-600">Manage users, properties, and disputes</p>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {statsCards.map((stat) => {
               const Icon = stat.icon
               return (
-                <Card key={stat.title} className="hover:shadow-md transition-shadow">
+                <Card key={stat.title} className="hover:shadow-md transition-shadow w-full">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600">{stat.title}</CardTitle>
                     <Icon className="h-4 w-4 text-gray-400" />
@@ -87,8 +87,8 @@ export default function AdminDashboard() {
           </div>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
+          <div className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <Card className="w-full">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Users className="h-5 w-5" />
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="w-full">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Building className="h-5 w-5" />
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="w-full">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <MessageSquare className="h-5 w-5" />

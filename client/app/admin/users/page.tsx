@@ -16,7 +16,7 @@ import { User } from "@/types"
 
 export default function AdminUsers() {
   const dispatch = useAppDispatch()
-  const { users, isLoading } = useAppSelector((state) => state.admin)
+  const { users = [], isLoading } = useAppSelector((state) => state.admin)
   const [searchTerm, setSearchTerm] = useState("")
   const [roleFilter, setRoleFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -30,55 +30,54 @@ export default function AdminUsers() {
       await dispatch(updateUserStatus({ userId, status })).unwrap()
       toast.success(`User ${status === "active" ? "activated" : "suspended"} successfully`)
     } catch (error) {
+      console.error("Status update failed:", error)
       toast.error("Failed to update user status")
     }
   }
 
   const filteredUsers = users.filter((user: User) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const name = user.name?.toLowerCase() || ""
+    const email = user.email?.toLowerCase() || ""
+    const matchesSearch = name.includes(searchTerm.toLowerCase()) || email.includes(searchTerm.toLowerCase())
     const matchesRole = roleFilter === "all" || user.role === roleFilter
     const matchesStatus = statusFilter === "all" || user.status === statusFilter
-
     return matchesSearch && matchesRole && matchesStatus
   })
 
-  const getStatusBadge = (status: string | undefined) => {
-    return status === "active" ? (
-      <Badge variant="default" className="bg-green-100 text-green-800">
-        <UserCheck className="h-3 w-3 mr-1" />
-        Active
-      </Badge>
-    ) : (
-      <Badge variant="destructive" className="bg-red-100 text-red-800">
-        <UserX className="h-3 w-3 mr-1" />
-        Suspended
-      </Badge>
-    )
+  const statusConfig: Record<string, { color: string; icon: typeof UserCheck; text: string }> = {
+    active: { color: "bg-green-100 text-green-800", icon: UserCheck, text: "Active" },
+    suspended: { color: "bg-red-100 text-red-800", icon: UserX, text: "Suspended" },
   }
 
-  const getRoleBadge = (role: string) => {
-    const colors = {
-      tenant: "bg-blue-100 text-blue-800",
-      landlord: "bg-purple-100 text-purple-800",
-      admin: "bg-orange-100 text-orange-800",
-    }
-
+  const getStatusBadge = (status?: string) => {
+    const config = statusConfig[status || "suspended"] || statusConfig.suspended
+    const Icon = config.icon
     return (
-      <Badge variant="outline" className={colors[role as keyof typeof colors]}>
-        {role.charAt(0).toUpperCase() + role.slice(1)}
+      <Badge variant="outline" className={config.color}>
+        <Icon className="h-3 w-3 mr-1" />
+        {config.text}
       </Badge>
     )
   }
+
+  const roleColors: Record<string, string> = {
+    tenant: "bg-blue-100 text-blue-800",
+    landlord: "bg-purple-100 text-purple-800",
+    admin: "bg-orange-100 text-orange-800",
+  }
+
+  const getRoleBadge = (role: string) => (
+    <Badge variant="outline" className={roleColors[role] || "bg-gray-100 text-gray-800"}>
+      {role.charAt(0).toUpperCase() + role.slice(1)}
+    </Badge>
+  )
 
   return (
     <AuthGuard allowedRoles={["admin"]}>
       <div className="min-h-screen bg-gray-50">
         <Navbar />
-
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
+          <div className="mb-8 text-center sm:text-left">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">User Management</h1>
             <p className="text-gray-600">Manage user accounts and permissions</p>
           </div>
@@ -102,7 +101,6 @@ export default function AdminUsers() {
                     className="pl-10"
                   />
                 </div>
-
                 <Select value={roleFilter} onValueChange={setRoleFilter}>
                   <SelectTrigger>
                     <SelectValue placeholder="Filter by role" />
@@ -114,7 +112,6 @@ export default function AdminUsers() {
                     <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
-
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger>
                     <SelectValue placeholder="Filter by status" />
@@ -140,7 +137,7 @@ export default function AdminUsers() {
             <CardContent>
               {isLoading ? (
                 <div className="space-y-4">
-                  {[...Array(5)].map((_, i) => (
+                  {Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="flex items-center justify-between p-4 border rounded-lg animate-pulse">
                       <div className="flex items-center space-x-4">
                         <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
@@ -155,51 +152,50 @@ export default function AdminUsers() {
                 </div>
               ) : filteredUsers.length > 0 ? (
                 <div className="space-y-4">
-                  {filteredUsers.map((user: User) => (
+                  {filteredUsers.map((user) => (
                     <div
                       key={user._id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-gray-50 gap-4"
                     >
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-4 flex-1">
                         <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-blue-600 font-semibold">{user.name.charAt(0).toUpperCase()}</span>
+                          <span className="text-blue-600 font-semibold">
+                            {user.name?.charAt(0).toUpperCase() || "U"}
+                          </span>
                         </div>
-                        <div>
-                          <div className="flex items-center space-x-2 mb-1">
-                            <h3 className="font-semibold text-gray-900">{user.name}</h3>
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center space-x-2 mb-1">
+                            <h3 className="font-semibold text-gray-900 truncate">{user.name}</h3>
                             {getRoleBadge(user.role)}
                             {getStatusBadge(user.status)}
                           </div>
-                          <p className="text-sm text-gray-600">{user.email}</p>
-                          <p className="text-xs text-gray-500">{user.phone}</p>
+                          <p className="text-sm text-gray-600 break-words">{user.email}</p>
+                          {user.phone && <p className="text-xs text-gray-500">{user.phone}</p>}
                         </div>
                       </div>
-
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center sm:justify-end space-x-2 w-full sm:w-auto">
                         {user.role !== "admin" && (
-                          <>
-                            {user.status === "active" ? (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleStatusUpdate(user._id, "suspended")}
-                                className="text-red-600 hover:text-red-700"
-                              >
-                                <UserX className="h-4 w-4 mr-1" />
-                                Suspend
-                              </Button>
-                            ) : (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleStatusUpdate(user._id, "active")}
-                                className="text-green-600 hover:text-green-700"
-                              >
-                                <UserCheck className="h-4 w-4 mr-1" />
-                                Activate
-                              </Button>
-                            )}
-                          </>
+                          user.status === "active" ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleStatusUpdate(user._id, "suspended")}
+                              className="text-red-600 hover:text-red-700 w-full sm:w-auto"
+                            >
+                              <UserX className="h-4 w-4 mr-1" />
+                              Suspend
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleStatusUpdate(user._id, "active")}
+                              className="text-green-600 hover:text-green-700 w-full sm:w-auto"
+                            >
+                              <UserCheck className="h-4 w-4 mr-1" />
+                              Activate
+                            </Button>
+                          )
                         )}
                       </div>
                     </div>

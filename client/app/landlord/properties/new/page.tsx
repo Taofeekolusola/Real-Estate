@@ -1,4 +1,6 @@
 "use client"
+
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAppDispatch, useAppSelector } from "@/hooks/redux"
 import { createProperty } from "@/store/slices/propertySlice"
@@ -7,48 +9,34 @@ import { Navbar } from "@/components/layout/navbar"
 import { PropertyForm } from "@/components/property/property-form"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
 
 export default function NewPropertyPage() {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const { isLoading } = useAppSelector((state) => state.property)
-  const [formError, setFormError] = useState<any>(null)
+  const [formError, setFormError] = useState<{
+    message?: string
+    status?: number
+    data?: unknown
+    violations?: unknown
+  } | null>(null)
 
-  // Explicitly type return as Promise<void>
-  const handleSubmit = async (formData: FormData): Promise<void> => {
+  const handleSubmit = async (formData: FormData) => {
     try {
       setFormError(null)
-
-      console.log("Submitting property data:")
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}:`, value)
-      }
-
       await dispatch(createProperty(formData)).unwrap()
       router.push("/landlord/properties")
-    } catch (error: unknown) {
-      console.error("Property creation failed:", error)
-
-      // Safely check error shape
+    } catch (error) {
       if (typeof error === "object" && error !== null) {
         const err = error as {
           message?: string
           status?: number
-          data?: any
-          violations?: any
+          data?: unknown
+          violations?: unknown
         }
-
-        console.error("Error details:", {
-          message: err.message,
-          status: err.status,
-          data: err.data,
-          violations: err.violations,
-        })
-
         setFormError(err)
       } else {
-        setFormError(error)
+        setFormError({ message: String(error) })
       }
     }
   }
@@ -57,7 +45,6 @@ export default function NewPropertyPage() {
     <AuthGuard allowedRoles={["landlord"]}>
       <div className="min-h-screen bg-gray-50">
         <Navbar />
-
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Button
             variant="ghost"

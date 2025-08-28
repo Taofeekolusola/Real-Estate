@@ -27,17 +27,13 @@ export default function TenantDisputesPage() {
   }, [dispatch])
 
   const handleDeleteDispute = async (disputeId: string) => {
-    if (!confirm("Are you sure you want to delete this dispute? This action cannot be undone.")) {
-      return
-    }
-
+    if (!confirm("Are you sure you want to delete this dispute? This action cannot be undone.")) return
     try {
-      console.log("[v0] Deleting dispute:", disputeId)
       await dispatch(deleteDispute(disputeId)).unwrap()
       await dispatch(fetchUserDisputes())
       toast.success("Dispute deleted successfully")
-    } catch (error) {
-      console.error("[v0] Failed to delete dispute:", error)
+    } catch (err) {
+      console.error("Failed to delete dispute:", err)
       toast.error("Failed to delete dispute")
     }
   }
@@ -48,12 +44,10 @@ export default function TenantDisputesPage() {
         return "default"
       case "in-progress":
         return "secondary"
-      // case "pending":
-      //   return "warning"
       case "rejected":
         return "destructive"
       default:
-        return "destructive"
+        return "secondary"
     }
   }
 
@@ -113,11 +107,11 @@ export default function TenantDisputesPage() {
                         </CardTitle>
                         <div className="flex items-center text-gray-600 mb-2">
                           <Building2 className="h-4 w-4 mr-2" />
-                          <span>{dispute.property.title}</span>
+                          <span>{dispute.property?.title || "Unknown Property"}</span>
                         </div>
                         <div className="flex items-center text-gray-600">
                           <User className="h-4 w-4 mr-2" />
-                          <span>Against: {dispute.againstUser.name}</span>
+                          <span>Against: {dispute.againstUser?.name || "Unknown User"}</span>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -153,7 +147,7 @@ export default function TenantDisputesPage() {
                       {dispute.assignedTo && (
                         <div className="flex items-center text-sm text-blue-600">
                           <User className="h-4 w-4 mr-2" />
-                          <span>Assigned to: {dispute.assignedTo.name}</span>
+                          <span>Assigned to: {dispute.assignedTo?.name || "N/A"}</span>
                         </div>
                       )}
 

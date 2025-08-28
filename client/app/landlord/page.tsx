@@ -46,15 +46,15 @@ export default function LandlordDashboard() {
       <div className="min-h-screen bg-gray-50">
         <Navbar />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Landlord Dashboard</h1>
             <p className="text-gray-600">Manage your properties and bookings</p>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 w-full">
+            <Card className="w-full">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Properties</CardTitle>
                 <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -64,7 +64,7 @@ export default function LandlordDashboard() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="w-full">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Approved</CardTitle>
                 <Eye className="h-4 w-4 text-muted-foreground" />
@@ -74,7 +74,7 @@ export default function LandlordDashboard() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="w-full">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Pending Approval</CardTitle>
                 <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -84,7 +84,7 @@ export default function LandlordDashboard() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="w-full">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Rent Value</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -96,8 +96,8 @@ export default function LandlordDashboard() {
           </div>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 w-full">
+            <Card className="w-full">
               <CardHeader>
                 <CardTitle>Add New Property</CardTitle>
                 <CardDescription>List a new property for rent</CardDescription>
@@ -112,7 +112,7 @@ export default function LandlordDashboard() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="w-full">
               <CardHeader>
                 <CardTitle>Manage Properties</CardTitle>
                 <CardDescription>View and edit your properties</CardDescription>
@@ -127,7 +127,7 @@ export default function LandlordDashboard() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="w-full">
               <CardHeader>
                 <CardTitle>Booking Requests</CardTitle>
                 <CardDescription>Review inspection requests</CardDescription>
@@ -144,7 +144,7 @@ export default function LandlordDashboard() {
           </div>
 
           {/* Recent Properties */}
-          <div className="mb-8">
+          <div className="mb-8 w-full">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Your Properties</h2>
               <Link href="/landlord/properties">
@@ -153,9 +153,9 @@ export default function LandlordDashboard() {
             </div>
 
             {isLoading ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-lg shadow-sm p-6 animate-pulse">
+                  <div key={i} className="bg-white rounded-lg shadow-sm p-6 animate-pulse w-full">
                     <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
                     <div className="h-4 bg-gray-200 rounded mb-2"></div>
                     <div className="h-4 bg-gray-200 rounded w-2/3"></div>
@@ -163,13 +163,13 @@ export default function LandlordDashboard() {
                 ))}
               </div>
             ) : myProperties.length > 0 ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                 {myProperties.slice(0, 6).map((property: Property) => (
                   <PropertyCard key={property._id} property={property} />
                 ))}
               </div>
             ) : (
-              <Card>
+              <Card className="w-full">
                 <CardContent className="text-center py-12">
                   <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">No Properties Yet</h3>

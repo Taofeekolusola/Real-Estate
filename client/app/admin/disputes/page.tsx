@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Search, MessageSquare, Clock, AlertTriangle, CheckCircle, User as UserIcon, Trash2 } from "lucide-react"
 import { toast } from "sonner"
-import {User}  from "@/types"
+import { User } from "@/types"
 
 export default function AdminDisputes() {
   const dispatch = useAppDispatch()
@@ -30,120 +30,80 @@ export default function AdminDisputes() {
     dispatch(fetchAllDisputes())
   }, [dispatch])
 
+  // --- Handlers ---
   const handleAssignMediator = async () => {
     if (!selectedDispute || !mediatorId) return
-
     try {
-      console.log("[v0] Assigning mediator to dispute:", selectedDispute._id)
-      await dispatch(
-        assignMediator({
-          disputeId: selectedDispute._id,
-          assignedTo: mediatorId,
-        }),
-      ).unwrap()
-
+      await dispatch(assignMediator({ disputeId: selectedDispute._id, assignedTo: mediatorId })).unwrap()
       await dispatch(fetchAllDisputes())
-
       toast.success("Mediator assigned successfully")
       setSelectedDispute(null)
       setMediatorId("")
-    } catch (error) {
-      console.error("[v0] Failed to assign mediator:", error)
+    } catch {
       toast.error("Failed to assign mediator")
     }
   }
 
   const handleResolveDispute = async () => {
     if (!selectedDispute || !resolutionNote) return
-
     try {
-      console.log("[v0] Resolving dispute:", selectedDispute._id)
-      await dispatch(
-        updateDisputeStatus({
-          disputeId: selectedDispute._id,
-          status: "resolved",
-          resolutionNote,
-        }),
-      ).unwrap()
-
+      await dispatch(updateDisputeStatus({ disputeId: selectedDispute._id, status: "resolved", resolutionNote })).unwrap()
       await dispatch(fetchAllDisputes())
-
       toast.success("Dispute resolved successfully")
       setSelectedDispute(null)
       setResolutionNote("")
-    } catch (error) {
-      console.error("[v0] Failed to resolve dispute:", error)
+    } catch {
       toast.error("Failed to resolve dispute")
     }
   }
 
   const handleSelfAssign = async (dispute: any) => {
     if (!user || dispute.status !== "pending") return
-
     try {
-      console.log("[v0] Self-assigning mediator to dispute:", dispute._id)
-      await dispatch(
-        assignMediator({
-          disputeId: dispute._id,
-          assignedTo: user._id,
-        }),
-      ).unwrap()
-
+      await dispatch(assignMediator({ disputeId: dispute._id, assignedTo: user._id })).unwrap()
       await dispatch(fetchAllDisputes())
-      toast.success("You have been assigned as mediator for this dispute")
-    } catch (error) {
-      console.error("[v0] Failed to self-assign as mediator:", error)
-      toast.error("Failed to assign yourself as mediator")
+      toast.success("You have been assigned as mediator")
+    } catch {
+      toast.error("Failed to self-assign as mediator")
     }
   }
 
   const handleDeleteDispute = async (disputeId: string) => {
-    if (!confirm("Are you sure you want to delete this dispute? This action cannot be undone.")) {
-      return
-    }
-
+    if (!confirm("Are you sure you want to delete this dispute?")) return
     try {
-      console.log("[v0] Deleting dispute:", disputeId)
       await dispatch(deleteDispute(disputeId)).unwrap()
       await dispatch(fetchAllDisputes())
       toast.success("Dispute deleted successfully")
-    } catch (error) {
-      console.error("[v0] Failed to delete dispute:", error)
+    } catch {
       toast.error("Failed to delete dispute")
     }
   }
 
+  // --- Filters ---
   const filteredDisputes = (disputes || []).filter((dispute) => {
     const createdByName = dispute.createdBy?.name || "Unknown User"
     const againstUserName = dispute.againstUser?.name || "Unknown User"
-
     const matchesSearch =
       dispute.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       createdByName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       againstUserName.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === "all" || dispute.status === statusFilter
-
     return matchesSearch && matchesStatus
   })
 
+  // --- Helpers ---
   const getStatusBadge = (status: string) => {
-    if (!["pending", "in-progress", "resolved"].includes(status)) {
-      console.warn("[v0] Unknown dispute status detected:", status)
-    }
-
     const statusConfig = {
       pending: { color: "bg-yellow-100 text-yellow-800", icon: Clock, text: "Pending" },
       "in-progress": { color: "bg-blue-100 text-blue-800", icon: AlertTriangle, text: "In Progress" },
       resolved: { color: "bg-green-100 text-green-800", icon: CheckCircle, text: "Resolved" },
     }
-
     const config = statusConfig[status as keyof typeof statusConfig] || {
       color: "bg-red-100 text-red-800",
       icon: AlertTriangle,
       text: `Invalid (${status})`,
     }
     const Icon = config.icon
-
     return (
       <Badge variant="outline" className={config.color}>
         <Icon className="h-3 w-3 mr-1" />
@@ -154,17 +114,12 @@ export default function AdminDisputes() {
 
   const canResolveDispute = (dispute: any) => {
     if (!user) return false
-
-    // Admin can always resolve disputes
     if (user.role === "admin") return true
-
-    // Check if current user is the assigned mediator
     if (dispute.assignedTo && dispute.assignedTo._id === user._id) return true
-
     return false
   }
 
-  const admins = users.filter((user: User) => user.role === "admin")
+  const admins = users.filter((u: User) => u.role === "admin")
 
   return (
     <AuthGuard allowedRoles={["admin"]}>
@@ -196,7 +151,6 @@ export default function AdminDisputes() {
                     className="pl-10"
                   />
                 </div>
-
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger>
                     <SelectValue placeholder="Filter by status" />
@@ -238,14 +192,15 @@ export default function AdminDisputes() {
                 <div className="space-y-4">
                   {filteredDisputes.map((dispute) => (
                     <div key={dispute._id} className="p-4 border rounded-lg hover:bg-gray-50">
-                      <div className="flex items-center justify-between mb-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                         <div className="flex items-center space-x-2">
                           <h3 className="font-semibold text-gray-900">
-                            {dispute.createdBy?.name || "Unknown User"} vs {dispute.againstUser?.name || "Unknown User"}
+                            {dispute.createdBy?.name || "Unknown"} vs {dispute.againstUser?.name || "Unknown"}
                           </h3>
                           {getStatusBadge(dispute.status)}
                         </div>
-                        <div className="flex items-center space-x-2">
+                        {/* Buttons wrapper */}
+                        <div className="flex flex-wrap items-center gap-2">
                           {dispute.status === "pending" && (
                             <>
                               <Dialog>
@@ -278,7 +233,6 @@ export default function AdminDisputes() {
                                   </div>
                                 </DialogContent>
                               </Dialog>
-
                               {user?.role === "admin" && (
                                 <Button
                                   variant="outline"
@@ -291,14 +245,13 @@ export default function AdminDisputes() {
                               )}
                             </>
                           )}
-
                           {dispute.status === "in-progress" && canResolveDispute(dispute) && (
                             <Dialog>
                               <DialogTrigger asChild>
                                 <Button
                                   size="sm"
                                   onClick={() => setSelectedDispute(dispute)}
-                                  className="bg-green-600 hover:bg-green-700"
+                                  className="bg-green-600 hover:bg-green-700 text-white"
                                 >
                                   <CheckCircle className="h-4 w-4 mr-1" />
                                   Resolve
@@ -322,13 +275,11 @@ export default function AdminDisputes() {
                               </DialogContent>
                             </Dialog>
                           )}
-
                           {dispute.status === "in-progress" && !canResolveDispute(dispute) && (
                             <Badge variant="outline" className="bg-gray-100 text-gray-600">
-                              Assigned to: {dispute.assignedTo?.name || "Another Mediator"}
+                              Assigned to: {dispute.assignedTo?.name || "Mediator"}
                             </Badge>
                           )}
-
                           <Button
                             variant="outline"
                             size="sm"
@@ -339,26 +290,22 @@ export default function AdminDisputes() {
                           </Button>
                         </div>
                       </div>
-
                       <p className="text-sm text-gray-600 mb-2">
                         <strong>Property:</strong> {dispute.property?.title || "Unknown Property"}
                       </p>
                       <p className="text-sm text-gray-600 mb-2">
                         <strong>Description:</strong> {dispute.description}
                       </p>
-
                       {dispute.assignedTo && (
                         <p className="text-sm text-blue-600 mb-2">
-                          <strong>Assigned to:</strong> {dispute.assignedTo?.name || "Unknown User"}
+                          <strong>Assigned to:</strong> {dispute.assignedTo?.name || "Unknown"}
                         </p>
                       )}
-
                       {dispute.resolutionNote && (
                         <p className="text-sm text-green-600 mb-2">
                           <strong>Resolution:</strong> {dispute.resolutionNote}
                         </p>
                       )}
-
                       <p className="text-xs text-gray-500">
                         Created: {new Date(dispute.createdAt).toLocaleDateString()}
                       </p>

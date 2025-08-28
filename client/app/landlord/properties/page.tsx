@@ -28,58 +28,34 @@ export default function LandlordPropertiesPage() {
   const dispatch = useAppDispatch()
   const { properties, isLoading } = useAppSelector((state) => state.property)
   const { user } = useAppSelector((state) => state.auth)
-  const [deleteError, setDeleteError] = useState("")
+  const [deleteError, setDeleteError] = useState<string>("")
 
   useEffect(() => {
-    console.log("Fetching properties...")
     dispatch(fetchProperties())
   }, [dispatch])
 
-  console.log("=== DEBUGGING PROPERTY DISPLAY ===")
-  console.log("All properties from Redux:", properties)
-  console.log("Properties count:", properties?.length)
-  console.log("Current user:", user)
-  console.log("User ID:", user?._id)
-
   const myProperties = (properties || []).filter((property: Property) => {
-    console.log("--- Checking property ---")
-    console.log("Property ID:", property._id)
-    console.log("Property title:", property.title)
-    console.log("Property landlord field:", property.landlord)
-    console.log("Property landlord type:", typeof property.landlord)
-
-    // Handle different possible structures for the landlord field
-    const landlordId = typeof property.landlord === "string" ? property.landlord : property.landlord?._id
-    console.log("Extracted landlord ID:", landlordId)
-    console.log("User ID for comparison:", user?._id)
-    console.log("IDs match:", landlordId === user?._id)
-    console.log("Property approved:", property.approved)
-    console.log("Property status:", property.status)
-
-    const isMatch = landlordId === user?._id
-    console.log("Will include this property:", isMatch)
-
-    return isMatch
+    const landlordId =
+      typeof property.landlord === "string" ? property.landlord : property.landlord?._id
+    return landlordId === user?._id
   })
-
-  console.log("Filtered my properties:", myProperties)
-  console.log("My properties count:", myProperties.length)
 
   const handleDeleteProperty = async (propertyId: string) => {
     try {
       await dispatch(deleteProperty(propertyId)).unwrap()
       setDeleteError("")
-    } catch (error: any) {
-      setDeleteError(error || "Failed to delete property")
+    } catch (error) {
+      setDeleteError(
+        typeof error === "string" ? error : "Failed to delete property. Please try again."
+      )
     }
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-NG", {
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat("en-NG", {
       style: "currency",
       currency: "NGN",
     }).format(amount)
-  }
 
   return (
     <AuthGuard allowedRoles={["landlord"]}>
@@ -90,7 +66,9 @@ export default function LandlordPropertiesPage() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">My Properties</h1>
-              <p className="text-gray-600">Manage your rental properties ({myProperties.length} properties)</p>
+              <p className="text-gray-600">
+                Manage your rental properties ({myProperties.length} properties)
+              </p>
             </div>
             <Link href="/landlord/properties/new">
               <Button className="flex items-center space-x-2">
@@ -98,14 +76,6 @@ export default function LandlordPropertiesPage() {
                 <span>Add Property</span>
               </Button>
             </Link>
-          </div>
-
-          <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <h3 className="font-semibold text-yellow-800 mb-2">Debug Info:</h3>
-            <p className="text-sm text-yellow-700">Total properties fetched: {properties?.length || 0}</p>
-            <p className="text-sm text-yellow-700">My properties: {myProperties.length}</p>
-            <p className="text-sm text-yellow-700">User ID: {user?._id}</p>
-            <p className="text-sm text-yellow-700">Check browser console for detailed logs</p>
           </div>
 
           {deleteError && (
@@ -126,10 +96,10 @@ export default function LandlordPropertiesPage() {
             </div>
           ) : myProperties.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {myProperties.map((property: Property) => (
+              {myProperties.map((property) => (
                 <Card key={property._id} className="overflow-hidden">
                   <div className="relative h-48 bg-gray-200">
-                    {property.images && property.images.length > 0 ? (
+                    {property.images?.length ? (
                       <img
                         src={property.images[0] || "/placeholder.svg"}
                         alt={property.title}
@@ -149,12 +119,10 @@ export default function LandlordPropertiesPage() {
 
                   <CardContent className="p-4">
                     <h3 className="font-semibold text-lg mb-2 line-clamp-1">{property.title}</h3>
-
                     <div className="flex items-center text-gray-600 mb-2">
                       <MapPin className="h-4 w-4 mr-1" />
                       <span className="text-sm line-clamp-1">{property.address}</span>
                     </div>
-
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center text-green-600 font-semibold">
                         <DollarSign className="h-4 w-4 mr-1" />
@@ -165,12 +133,11 @@ export default function LandlordPropertiesPage() {
                         <span>{property.durationInMonths} months</span>
                       </div>
                     </div>
-
                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">{property.description}</p>
 
                     <div className="flex space-x-2">
                       <Link href={`/properties/${property._id}`} className="flex-1">
-                        <Button variant="outline" size="sm" className="w-full bg-transparent">
+                        <Button variant="outline" size="sm" className="w-full">
                           View
                         </Button>
                       </Link>
@@ -184,7 +151,7 @@ export default function LandlordPropertiesPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="text-red-600 hover:text-red-700 bg-transparent"
+                            className="text-red-600 hover:text-red-700"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -193,7 +160,8 @@ export default function LandlordPropertiesPage() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete Property</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to delete "{property.title}"? This action cannot be undone.
+                              Are you sure you want to delete "{property.title}"? This action
+                              cannot be undone.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>

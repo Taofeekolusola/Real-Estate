@@ -24,9 +24,10 @@ import {
 import Link from "next/link"
 import { MapPin, User, MessageSquare, Eye, Clock, Check, X, Phone, Mail } from "lucide-react"
 import { Booking } from "@/types"
+
 export default function LandlordBookingsPage() {
   const dispatch = useAppDispatch()
-  const { bookings, isLoading, error } = useAppSelector((state) => state.booking)
+  const { bookings = [], isLoading, error } = useAppSelector((state) => state.booking)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [actionError, setActionError] = useState("")
 
@@ -34,9 +35,9 @@ export default function LandlordBookingsPage() {
     dispatch(fetchLandlordBookings())
   }, [dispatch])
 
-  const pendingBookings = (bookings || []).filter((booking: Booking) => booking.status === "pending")
-  const approvedBookings = (bookings || []).filter((booking: Booking) => booking.status === "approved")
-  const rejectedBookings = (bookings || []).filter((booking: Booking) => booking.status === "rejected")
+  const pendingBookings = bookings.filter((b: Booking) => b.status === "pending")
+  const approvedBookings = bookings.filter((b: Booking) => b.status === "approved")
+  const rejectedBookings = bookings.filter((b: Booking) => b.status === "rejected")
 
   const handleStatusUpdate = async (bookingId: string, status: "approved" | "rejected") => {
     setActionLoading(bookingId)
@@ -44,25 +45,20 @@ export default function LandlordBookingsPage() {
 
     try {
       await dispatch(updateBookingStatus({ bookingId, status })).unwrap()
-      setActionError("")
       dispatch(fetchLandlordBookings())
-    } catch (error: any) {
-      const errorMsg = error || "Failed to update booking status"
+    } catch (err: any) {
+      const errorMsg = err || "Failed to update booking status"
       setActionError(errorMsg)
-
       dispatch(fetchLandlordBookings())
-
       if (errorMsg.includes("email notification failed")) {
-        setTimeout(() => {
-          dispatch(fetchLandlordBookings())
-        }, 2000)
+        setTimeout(() => dispatch(fetchLandlordBookings()), 2000)
       }
     } finally {
       setActionLoading(null)
     }
   }
 
-  const getStatusColor = (status: string) => {
+  const getStatusVariant = (status: string) => {
     switch (status) {
       case "approved":
         return "default"
@@ -73,17 +69,16 @@ export default function LandlordBookingsPage() {
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     })
-  }
 
-  const BookingCard = ({ booking }: { booking: any }) => (
+  const BookingCard = ({ booking }: { booking: Booking }) => (
     <Card key={booking._id}>
       <CardHeader>
         <div className="flex items-start justify-between">
@@ -98,7 +93,7 @@ export default function LandlordBookingsPage() {
               <span>Tenant: {booking.tenant.name}</span>
             </div>
           </div>
-          <Badge variant={getStatusColor(booking.status)}>{booking.status}</Badge>
+          <Badge variant={getStatusVariant(booking.status)}>{booking.status}</Badge>
         </div>
       </CardHeader>
 
@@ -211,11 +206,39 @@ export default function LandlordBookingsPage() {
     </Card>
   )
 
+  const renderTabContent = (items: Booking[], emptyIcon: JSX.Element, emptyTitle: string, emptyDesc: string) =>
+    isLoading ? (
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <Card key={i} className="animate-pulse">
+            <CardContent className="p-6">
+              <div className="h-4 bg-gray-200 rounded mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
+              <div className="h-20 bg-gray-200 rounded"></div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    ) : items.length > 0 ? (
+      <div className="space-y-6">
+        {items.map((booking) => (
+          <BookingCard key={booking._id} booking={booking} />
+        ))}
+      </div>
+    ) : (
+      <Card>
+        <CardContent className="text-center py-12">
+          {emptyIcon}
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">{emptyTitle}</h3>
+          <p className="text-gray-600">{emptyDesc}</p>
+        </CardContent>
+      </Card>
+    )
+
   return (
     <AuthGuard allowedRoles={["landlord"]}>
       <div className="min-h-screen bg-gray-50">
         <Navbar />
-
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Booking Requests</h1>
@@ -274,68 +297,27 @@ export default function LandlordBookingsPage() {
             </TabsList>
 
             <TabsContent value="pending">
-              {isLoading ? (
-                <div className="space-y-4">
-                  {[...Array(3)].map((_, i) => (
-                    <Card key={i} className="animate-pulse">
-                      <CardContent className="p-6">
-                        <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                        <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
-                        <div className="h-20 bg-gray-200 rounded"></div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : pendingBookings.length > 0 ? (
-                <div className="space-y-6">
-                  {pendingBookings.map((booking: Booking) => (
-                    <BookingCard key={booking._id} booking={booking} />
-                  ))}
-                </div>
-              ) : (
-                <Card>
-                  <CardContent className="text-center py-12">
-                    <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No Pending Requests</h3>
-                    <p className="text-gray-600">All inspection requests have been reviewed</p>
-                  </CardContent>
-                </Card>
+              {renderTabContent(
+                pendingBookings,
+                <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />,
+                "No Pending Requests",
+                "All inspection requests have been reviewed"
               )}
             </TabsContent>
-
             <TabsContent value="approved">
-              {approvedBookings.length > 0 ? (
-                <div className="space-y-6">
-                  {approvedBookings.map((booking: Booking) => (
-                    <BookingCard key={booking._id} booking={booking} />
-                  ))}
-                </div>
-              ) : (
-                <Card>
-                  <CardContent className="text-center py-12">
-                    <Check className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No Approved Requests</h3>
-                    <p className="text-gray-600">No inspection requests have been approved yet</p>
-                  </CardContent>
-                </Card>
+              {renderTabContent(
+                approvedBookings,
+                <Check className="h-12 w-12 text-gray-400 mx-auto mb-4" />,
+                "No Approved Requests",
+                "No inspection requests have been approved yet"
               )}
             </TabsContent>
-
             <TabsContent value="rejected">
-              {rejectedBookings.length > 0 ? (
-                <div className="space-y-6">
-                  {rejectedBookings.map((booking: Booking) => (
-                    <BookingCard key={booking._id} booking={booking} />
-                  ))}
-                </div>
-              ) : (
-                <Card>
-                  <CardContent className="text-center py-12">
-                    <X className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No Rejected Requests</h3>
-                    <p className="text-gray-600">No inspection requests have been rejected</p>
-                  </CardContent>
-                </Card>
+              {renderTabContent(
+                rejectedBookings,
+                <X className="h-12 w-12 text-gray-400 mx-auto mb-4" />,
+                "No Rejected Requests",
+                "No inspection requests have been rejected"
               )}
             </TabsContent>
           </Tabs>

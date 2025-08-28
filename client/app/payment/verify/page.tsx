@@ -15,47 +15,38 @@ export default function PaymentVerificationPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const dispatch = useAppDispatch()
-  const { currentPayment, isLoading, error } = useAppSelector((state) => state.payment)
-  const [verificationStatus, setVerificationStatus] = useState<"loading" | "success" | "failed">("loading")
+  const { currentPayment, error } = useAppSelector((state) => state.payment)
 
+  const [verificationStatus, setVerificationStatus] = useState<"loading" | "success" | "failed">("loading")
   const reference = searchParams.get("reference")
 
   useEffect(() => {
-  if (reference) {
+    if (!reference) {
+      setVerificationStatus("failed")
+      return
+    }
+
     dispatch(verifyPayment(reference))
       .unwrap()
       .then((result: { payment?: Payment }) => {
-        if (result.payment && result.payment.status === "success") {
-          setVerificationStatus("success")
-        } else {
-          setVerificationStatus("failed")
-        }
+        setVerificationStatus(result.payment?.status === "success" ? "success" : "failed")
       })
-      .catch(() => {
-        setVerificationStatus("failed")
-      })
-  } else {
-    setVerificationStatus("failed")
-  }
-}, [reference, dispatch])
+      .catch(() => setVerificationStatus("failed"))
+  }, [reference, dispatch])
 
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" }).format(amount)
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-    }).format(amount)
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     })
-  }
+
+  const handleNavigation = (path: string) => router.push(path)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -81,33 +72,18 @@ export default function PaymentVerificationPage() {
                 <h3 className="text-2xl font-bold text-green-600 mb-2">Payment Successful!</h3>
                 <p className="text-gray-600 mb-6">Your rental payment has been processed successfully.</p>
 
-                <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
-                  <div className="space-y-3 text-left">
-                    <div className="flex justify-between">
-                      <span className="font-medium">Amount Paid:</span>
-                      <span className="font-bold text-green-600">{formatCurrency(currentPayment.amount)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium">Reference:</span>
-                      <span className="font-mono text-sm">{currentPayment.reference}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium">Date:</span>
-                      <span>{formatDate(currentPayment.createdAt)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium">Status:</span>
-                      <span className="text-green-600 font-semibold">Completed</span>
-                    </div>
-                  </div>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6 space-y-3 text-left">
+                  <div className="flex justify-between"><span className="font-medium">Amount Paid:</span><span className="font-bold text-green-600">{formatCurrency(currentPayment.amount)}</span></div>
+                  <div className="flex justify-between"><span className="font-medium">Reference:</span><span className="font-mono text-sm">{currentPayment.reference}</span></div>
+                  <div className="flex justify-between"><span className="font-medium">Date:</span><span>{formatDate(currentPayment.createdAt)}</span></div>
+                  <div className="flex justify-between"><span className="font-medium">Status:</span><span className="text-green-600 font-semibold">Completed</span></div>
                 </div>
 
                 <div className="space-y-3">
-                  <Button onClick={() => router.push("/tenant/bookings")} className="w-full">
-                    <ArrowRight className="h-4 w-4 mr-2" />
-                    View My Bookings
+                  <Button onClick={() => handleNavigation("/tenant/bookings")} className="w-full">
+                    <ArrowRight className="h-4 w-4 mr-2" /> View My Bookings
                   </Button>
-                  <Button variant="outline" onClick={() => router.push("/tenant")} className="w-full bg-transparent">
+                  <Button variant="outline" onClick={() => handleNavigation("/tenant")} className="w-full bg-transparent">
                     Go to Dashboard
                   </Button>
                 </div>
@@ -129,10 +105,10 @@ export default function PaymentVerificationPage() {
                 )}
 
                 <div className="space-y-3">
-                  <Button onClick={() => router.push("/tenant/bookings")} className="w-full">
+                  <Button onClick={() => handleNavigation("/tenant/bookings")} className="w-full">
                     Try Again
                   </Button>
-                  <Button variant="outline" onClick={() => router.push("/tenant")} className="w-full bg-transparent">
+                  <Button variant="outline" onClick={() => handleNavigation("/tenant")} className="w-full bg-transparent">
                     Go to Dashboard
                   </Button>
                 </div>

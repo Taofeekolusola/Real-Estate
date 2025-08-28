@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
+import Link from "next/link"
 import { useAppDispatch, useAppSelector } from "@/hooks/redux"
 import { fetchMyBookings, cancelBooking } from "@/store/slices/bookingSlice"
 import { AuthGuard } from "@/components/auth/auth-guard"
@@ -9,7 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import Link from "next/link"
 import { Calendar, MapPin, User, MessageSquare, Eye, Clock, CreditCard, X } from "lucide-react"
 import { toast } from "sonner"
 import { Booking } from "@/types"
@@ -23,22 +23,18 @@ export default function TenantBookingsPage() {
   }, [dispatch])
 
   const handleCancelBooking = async (bookingId: string) => {
-    if (!confirm("Are you sure you want to cancel this booking? This action cannot be undone.")) {
-      return
-    }
+    if (!confirm("Are you sure you want to cancel this booking? This action cannot be undone.")) return
 
     try {
-      console.log("[v0] Cancelling booking:", bookingId)
       await dispatch(cancelBooking(bookingId)).unwrap()
       await dispatch(fetchMyBookings())
       toast.success("Booking cancelled successfully")
-    } catch (error) {
-      console.error("[v0] Failed to cancel booking:", error)
+    } catch (err) {
       toast.error("Failed to cancel booking")
     }
   }
 
-  const getStatusColor = (status: string) => {
+  const getStatusVariant = (status: string) => {
     switch (status) {
       case "approved":
         return "default"
@@ -49,15 +45,14 @@ export default function TenantBookingsPage() {
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (date: string) =>
+    new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     })
-  }
 
   return (
     <AuthGuard allowedRoles={["tenant"]}>
@@ -88,9 +83,9 @@ export default function TenantBookingsPage() {
                 </Card>
               ))}
             </div>
-          ) : (bookings || []).length > 0 ? (
+          ) : bookings?.length ? (
             <div className="space-y-6">
-              {(bookings || []).map((booking: Booking) => (
+              {bookings.map((booking: Booking) => (
                 <Card key={booking._id}>
                   <CardHeader>
                     <div className="flex items-start justify-between">
@@ -103,15 +98,12 @@ export default function TenantBookingsPage() {
                         <div className="flex items-center text-gray-600">
                           <User className="h-4 w-4 mr-2" />
                           <span>
-                            Landlord:{" "}
-                            {booking.landlord && typeof booking.landlord === "object" && booking.landlord.name
-                              ? booking.landlord.name
-                              : "Unknown Landlord"}
+                            Landlord: {booking.landlord && typeof booking.landlord === "object" && booking.landlord.name ? booking.landlord.name : "Unknown Landlord"}
                           </span>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Badge variant={getStatusColor(booking.status)}>{booking.status}</Badge>
+                        <Badge variant={getStatusVariant(booking.status)}>{booking.status}</Badge>
                         {booking.status === "pending" && (
                           <Button
                             variant="outline"
