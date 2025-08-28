@@ -11,10 +11,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PropertyCard } from "@/components/property/property-card"
 import { Search, Calendar, MessageSquare, Star } from "lucide-react"
 import { Property } from "@/types"
+import SuspendedPage from "@/app/suspended/page";
 
 export default function TenantDashboard() {
   const dispatch = useAppDispatch()
   const { properties, isLoading } = useAppSelector((state) => state.property)
+  const { user } = useAppSelector((state) => state.auth)
 
   useEffect(() => {
     dispatch(fetchProperties())
@@ -23,6 +25,11 @@ export default function TenantDashboard() {
   const approvedProperties = (properties || []).filter(
     (property: Property) => property.status === "approved" || property.approved === true,
   )
+
+  // 🚨 Block suspended users
+  if (user?.status === "suspended") {
+    return <SuspendedPage />
+  }
 
   return (
     <AuthGuard allowedRoles={["tenant"]}>

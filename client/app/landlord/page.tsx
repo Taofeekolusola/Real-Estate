@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PropertyCard } from "@/components/property/property-card"
 import { Building2, Plus, Eye, Calendar, DollarSign } from "lucide-react"
 import { Property } from "@/types"
+import SuspendedPage from "@/app/suspended/page"; // ✅ import the suspended page
 
 export default function LandlordDashboard() {
   const dispatch = useAppDispatch()
@@ -39,6 +40,11 @@ export default function LandlordDashboard() {
       style: "currency",
       currency: "NGN",
     }).format(amount)
+  }
+
+  // 🚨 Block suspended landlords
+  if (user?.status === "suspended") {
+    return <SuspendedPage />
   }
 
   return (

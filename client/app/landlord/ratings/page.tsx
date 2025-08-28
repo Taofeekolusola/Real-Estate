@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Star, User, MessageSquare } from "lucide-react"
 import { Rating } from "@/types"
+import SuspendedPage from "@/app/suspended/page" // ✅ import the suspended page
 
 export default function LandlordRatingsPage() {
   const dispatch = useAppDispatch()
@@ -18,6 +19,11 @@ export default function LandlordRatingsPage() {
   useEffect(() => {
     if (user?._id) dispatch(fetchLandlordRatings(user._id))
   }, [dispatch, user])
+
+  // ✅ Check if user is suspended
+  if (user?.status === "suspended") {
+    return <SuspendedPage />
+  }
 
   const ratings = landlordRatings || []
   const averageRating =

@@ -14,11 +14,13 @@ import { CreateDisputeDialog } from "@/components/dispute/create-dispute-dialog"
 import { MessageSquare, Plus, Clock, User, Building2, AlertTriangle, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { Dispute } from "@/types"
+import SuspendedPage from "@/app/suspended/page"   // ⬅️ import suspended page
 
 export default function TenantDisputesPage() {
   const dispatch = useAppDispatch()
   const { disputes, isLoading, error } = useAppSelector((state) => state.dispute)
   const { properties } = useAppSelector((state) => state.property)
+  const { user } = useAppSelector((state) => state.auth)   // ⬅️ grab user
   const [showCreateDialog, setShowCreateDialog] = useState(false)
 
   useEffect(() => {
@@ -57,6 +59,11 @@ export default function TenantDisputesPage() {
       month: "long",
       day: "numeric",
     })
+  }
+
+  // ⬅️ suspended check: short-circuit before rendering disputes
+  if (user?.status === "suspended") {
+    return <SuspendedPage />
   }
 
   return (

@@ -24,16 +24,23 @@ import {
 import Link from "next/link"
 import { MapPin, User, MessageSquare, Eye, Clock, Check, X, Phone, Mail } from "lucide-react"
 import { Booking } from "@/types"
+import SuspendedPage from "@/app/suspended/page"   // ⬅️ import SuspendedPage
 
 export default function LandlordBookingsPage() {
   const dispatch = useAppDispatch()
   const { bookings = [], isLoading, error } = useAppSelector((state) => state.booking)
+  const { user } = useAppSelector((state) => state.auth)   // ⬅️ get logged-in user
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [actionError, setActionError] = useState("")
 
   useEffect(() => {
     dispatch(fetchLandlordBookings())
   }, [dispatch])
+
+  // ⬅️ suspended check
+  if (user?.status === "suspended") {
+    return <SuspendedPage />
+  }
 
   const pendingBookings = bookings.filter((b: Booking) => b.status === "pending")
   const approvedBookings = bookings.filter((b: Booking) => b.status === "approved")

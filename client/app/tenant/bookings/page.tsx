@@ -13,10 +13,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Calendar, MapPin, User, MessageSquare, Eye, Clock, CreditCard, X } from "lucide-react"
 import { toast } from "sonner"
 import { Booking } from "@/types"
+import SuspendedPage from "@/app/suspended/page"   // ⬅️ import SuspendedPage
 
 export default function TenantBookingsPage() {
   const dispatch = useAppDispatch()
   const { bookings, isLoading, error } = useAppSelector((state) => state.booking)
+  const { user } = useAppSelector((state) => state.auth)   // ⬅️ get logged-in user
 
   useEffect(() => {
     dispatch(fetchMyBookings())
@@ -53,6 +55,11 @@ export default function TenantBookingsPage() {
       hour: "2-digit",
       minute: "2-digit",
     })
+
+  // ⬅️ suspended check
+  if (user?.status === "suspended") {
+    return <SuspendedPage />
+  }
 
   return (
     <AuthGuard allowedRoles={["tenant"]}>
@@ -98,7 +105,10 @@ export default function TenantBookingsPage() {
                         <div className="flex items-center text-gray-600">
                           <User className="h-4 w-4 mr-2" />
                           <span>
-                            Landlord: {booking.landlord && typeof booking.landlord === "object" && booking.landlord.name ? booking.landlord.name : "Unknown Landlord"}
+                            Landlord:{" "}
+                            {booking.landlord && typeof booking.landlord === "object" && booking.landlord.name
+                              ? booking.landlord.name
+                              : "Unknown Landlord"}
                           </span>
                         </div>
                       </div>

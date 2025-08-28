@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Property } from "@/types"
 import { Plus, Edit, Trash2, MapPin, DollarSign, Calendar } from "lucide-react"
+import SuspendedPage from "@/app/suspended/page"   // 👈 import the suspended page
 
 export default function LandlordPropertiesPage() {
   const dispatch = useAppDispatch()
@@ -31,8 +32,15 @@ export default function LandlordPropertiesPage() {
   const [deleteError, setDeleteError] = useState<string>("")
 
   useEffect(() => {
-    dispatch(fetchProperties())
-  }, [dispatch])
+    if (user?.status !== "suspended") {
+      dispatch(fetchProperties())
+    }
+  }, [dispatch, user])
+
+  // 🚨 Check for suspension
+  if (user?.status === "suspended") {
+    return <SuspendedPage />
+  }
 
   const myProperties = (properties || []).filter((property: Property) => {
     const landlordId =
