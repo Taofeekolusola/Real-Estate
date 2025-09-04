@@ -14,6 +14,8 @@ const userSchema = new mongoose.Schema(
       enum: ["tenant", "landlord", "admin"],
       default: "tenant",
     },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
     isVerified: { type: Boolean, default: false },
     status: {
       type: String,

@@ -2,6 +2,9 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require('nodemailer');
+const dotenv = require("dotenv");
+dotenv.config();
 
 //const { verifyNIN, verifyBVN } = require("../services/verify");
 
@@ -166,40 +169,40 @@ exports.deleteUserProfile = async (req, res) => {
 
 const sendEmail = async (email, resetLink) => {
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail",
     auth: {
-      user: 'your-email@gmail.com',
-      pass: 'your-email-password',
+      user: process.env.SMTP_EMAIL,   // from .env
+      pass: process.env.SMTP_PASSWORD // from .env (App Password)
     },
   });
 
   const mailOptions = {
-    from: 'your-email@gmail.com',
+    from: process.env.SMTP_EMAIL, // must match the authenticated user
     to: email,
-    subject: 'Password Reset Request',
+    subject: "Password Reset Request",
     html: `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`,
   };
 
   await transporter.sendMail(mailOptions);
-  
-  // implement actual email sending in production.
-  console.log("reset link " , resetLink)
+
+  console.log("Reset link sent:", resetLink);
 };
 
-//desc request password reset (send reset link)
-//route
-//access private
+
+// desc: request a password reset link
+// route: POST /auth/request-reset
+// access: public
 exports.requestPasswordReset = async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ email }); // ✅ mongoose syntax
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     // Generate a reset token
-    const token = jwt.sign({ id: user.id }, config.jwtSecret, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
     // Construct the reset link
     const resetLink = `http://localhost:5002/auth/reset/${token}`;
@@ -207,40 +210,40 @@ exports.requestPasswordReset = async (req, res) => {
     // Send the reset link to the user's email
     await sendEmail(user.email, resetLink);
 
-    res.json({ message: 'Password reset link sent to your email' });
+    res.json({
+  message: "Password reset link sent to your email",
+  token,       // 👈 add this
+  resetLink    // 👈 add this
+});
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-//desc resets a user password
-//route post /auth/reset
-//access private
+// desc: reset a user's password
+// route: POST /auth/reset
+// access: public (via token)
 exports.resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
     // Verify the token
-    const decoded = jwt.verify(token, config.jwtSecret);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Find the user by the ID from the decoded token
-    const user = await User.findByPk(decoded.id);
+    // Find the user by ID
+    const user = await User.findById(decoded.id); // ✅ mongoose syntax
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // Hash the new password before saving it
+    // Hash the new password before saving
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // Update the user's password
     user.password = hashedPassword;
     await user.save();
 
-    res.json({ message: 'Password has been reset successfully' });
+    res.json({ message: "Password has been reset successfully" });
   } catch (error) {
-    res.status(500).json({
-      error: error.message
-    });
+    res.status(500).json({ error: error.message });
   }
 };
