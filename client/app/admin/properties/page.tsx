@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Building, Check, Clock, X } from "lucide-react"
 import { toast } from "sonner"
+import Link from "next/link"
 
 export default function AdminProperties() {
   const dispatch = useAppDispatch()
@@ -36,14 +37,16 @@ export default function AdminProperties() {
   const filteredProperties = (properties || []).filter((property) => {
     const title = property.title || ""
     const address = property.address || ""
-    const landlordName = typeof property.landlord === "object" ? property.landlord?.name || "" : ""
+    const landlordName =
+      typeof property.landlord === "object" ? property.landlord?.name || "" : ""
 
     const matchesSearch =
       title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       address.toLowerCase().includes(searchTerm.toLowerCase()) ||
       landlordName.toLowerCase().includes(searchTerm.toLowerCase())
 
-    const status = property.status || (property.approved ? "approved" : "pending")
+    // ✅ derive status from approved flag
+    const status = property.approved ? "approved" : "pending"
     const matchesStatus = statusFilter === "all" || status === statusFilter
 
     return matchesSearch && matchesStatus
@@ -129,7 +132,10 @@ export default function AdminProperties() {
               {isLoading ? (
                 <div className="space-y-4">
                   {[...Array(5)].map((_, i) => (
-                    <div key={i} className="flex items-center justify-between p-4 border rounded-lg animate-pulse">
+                    <div
+                      key={i}
+                      className="flex items-center justify-between p-4 border rounded-lg animate-pulse"
+                    >
                       <div className="flex items-center space-x-4">
                         <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
                         <div className="space-y-2">
@@ -144,58 +150,70 @@ export default function AdminProperties() {
                 </div>
               ) : filteredProperties.length > 0 ? (
                 <div className="space-y-4">
-                  {filteredProperties.map((property) => (
-                    <div
-                      key={property._id}
-                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg hover:bg-gray-50 gap-4"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center">
-                          <Building className="h-8 w-8 text-blue-600" />
-                        </div>
-                        <div>
-                          <div className="flex items-center space-x-2 mb-1">
-                            <h3 className="font-semibold text-gray-900">{property.title}</h3>
-                            {getStatusBadge(property.status || (property.approved ? "approved" : "pending"))}
+                  {filteredProperties.map((property) => {
+                    const status = property.approved ? "approved" : "pending"
+                    return (
+                      <div
+                        key={property._id}
+                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg hover:bg-gray-50 gap-4"
+                      >
+                        <div className="flex items-center space-x-4">
+                          <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <Building className="h-8 w-8 text-blue-600" />
                           </div>
-                          <p className="text-sm text-gray-600 mb-1">{property.address}</p>
-                          <p className="text-sm text-gray-500">
-                            Landlord: {typeof property.landlord === "object"
-                              ? `${property.landlord?.name || "Unknown"} (${property.landlord?.email || "No email"})`
-                              : "Landlord ID: " + property.landlord}
-                          </p>
-                          <p className="text-sm font-semibold text-green-600">
-                            ₦{property.rentAmount?.toLocaleString() || 0}/month
-                          </p>
+                          <div>
+                            <div className="flex items-center space-x-2 mb-1">
+                              <h3 className="font-semibold text-gray-900">
+                                {property.title}
+                              </h3>
+                              {getStatusBadge(status)}
+                            </div>
+                            <p className="text-sm text-gray-600 mb-1">
+                              {property.address}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              Landlord:{" "}
+                              {typeof property.landlord === "object"
+                                ? `${property.landlord?.name || "Unknown"} (${
+                                    property.landlord?.email || "No email"
+                                  })`
+                                : "Landlord ID: " + property.landlord}
+                            </p>
+                            <p className="text-sm font-semibold text-green-600">
+                              ₦{property.rentAmount?.toLocaleString() || 0}/month
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                          {status === "pending" && (
+                            <Button
+                              onClick={() => handleApproveProperty(property._id)}
+                              className="bg-green-600 hover:bg-green-700 flex-1 sm:flex-none"
+                            >
+                              <Check className="h-4 w-4 mr-1" />
+                              Approve
+                            </Button>
+                          )}
+                          <Link href={`/properties/${property._id}`} className="flex-1">
+                            <Button variant="outline" size="sm" className="w-full">
+                              View Details
+                            </Button>
+                          </Link>
                         </div>
                       </div>
-
-                      <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-                        {(property.status === "pending" || (!property.status && !property.approved)) && (
-                          <Button
-                            onClick={() => handleApproveProperty(property._id)}
-                            className="bg-green-600 hover:bg-green-700 flex-1 sm:flex-none"
-                          >
-                            <Check className="h-4 w-4 mr-1" />
-                            Approve
-                          </Button>
-                        )}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 sm:flex-none"
-                        >
-                          View Details
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-12">
                   <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No Properties Found</h3>
-                  <p className="text-gray-600">No properties match your current filters</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No Properties Found
+                  </h3>
+                  <p className="text-gray-600">
+                    No properties match your current filters
+                  </p>
                 </div>
               )}
             </CardContent>

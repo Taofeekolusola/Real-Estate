@@ -29,7 +29,7 @@ export default function PropertiesPage() {
   }, [dispatch])
 
   const filteredProperties = properties.filter((property: Property) => {
-    const isApproved = property.status === "approved"
+    const isApproved = property.approved === true
     const matchesSearch =
       property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       property.address.toLowerCase().includes(searchTerm.toLowerCase())
