@@ -30,11 +30,11 @@ export default function LoginPage() {
   const router = useRouter()
 
   useEffect(() => {
-      const interval = setInterval(() => {
-        setCurrentImage((prev) => (prev + 1) % images.length)
-      }, 4000)
-      return () => clearInterval(interval)
-    }, [])
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % images.length)
+    }, 4000)
+    return () => clearInterval(interval)
+  }, [])
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
@@ -72,11 +72,11 @@ export default function LoginPage() {
           <div className="hidden md:flex md:w-1/2 relative">
           </div>
           <div className="relative z-10 flex flex-col justify-center items-center mt-6 text-center px-8 text-white">
-              <Building2 className="h-40 w-40 mb-2.5 text-white-500" />
-              <h1 className="text-4xl font-bold mb-4">Welcome to RentEase</h1>
-              <p className="text-lg max-w-md">
-                Find your perfect home or manage your properties with ease.
-              </p>
+            <Building2 className="h-40 w-40 mb-2.5 text-white-500" />
+            <h1 className="text-4xl font-bold mb-4">Welcome to RentEase</h1>
+            <p className="text-lg max-w-md">
+              Find your perfect home or manage your properties with ease.
+            </p>
           </div>
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30" />
         </div>
@@ -150,7 +150,12 @@ export default function LoginPage() {
                 </Button>
               </form>
 
-              <div className="mt-6 text-center">
+              <div className="mt-6 text-center space-y-2">
+                <p className="text-sm text-gray-400">
+                  <Link href="/forgot-password" className="text-blue-400 hover:underline font-medium">
+                    Forgot your password?
+                  </Link>
+                </p>
                 <p className="text-sm text-gray-400">
                   Don't have an account?{" "}
                   <Link href="/register" className="text-blue-400 hover:underline font-medium">
