@@ -42,28 +42,31 @@ export function Navbar() {
     <nav className="border-b bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <Building2 className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">RentEase</span>
+          <div className="flex items-center min-w-0 flex-1">
+            <Link href="/" className="flex items-center space-x-2 min-w-0">
+              <Building2 className="h-8 w-8 text-blue-600 flex-shrink-0" />
+              <span className="text-xl font-bold text-gray-900 truncate">RentEase</span>
             </Link>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
             {user ? (
               <>
                 <Link href="/properties">
                   <Button variant="ghost" className="flex items-center space-x-2">
                     <Home className="h-4 w-4" />
-                    <span>Properties</span>
+                    <span className="hidden sm:inline">Properties</span>
                   </Button>
                 </Link>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center space-x-2">
-                      <User className="h-4 w-4" />
-                      <span>{user.name}</span>
+                    <Button variant="ghost" className="flex items-center space-x-2 max-w-[200px]">
+                      <User className="h-4 w-4 flex-shrink-0" />
+                      <span className="truncate">
+                        <span className="hidden sm:inline">{user.name}</span>
+                        <span className="sm:hidden">{user.name?.split(' ')[0] || user.name}</span>
+                      </span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
@@ -123,12 +126,18 @@ export function Navbar() {
                 </DropdownMenu>
               </>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 sm:space-x-2">
                 <Link href="/login">
-                  <Button variant="ghost">Login</Button>
+                  <Button variant="ghost" size="sm" className="text-sm">
+                    <span className="hidden sm:inline">Login</span>
+                    <span className="sm:hidden">Sign In</span>
+                  </Button>
                 </Link>
                 <Link href="/register">
-                  <Button>Get Started</Button>
+                  <Button size="sm" className="text-sm">
+                    <span className="hidden sm:inline">Get Started</span>
+                    <span className="sm:hidden">Sign Up</span>
+                  </Button>
                 </Link>
               </div>
             )}

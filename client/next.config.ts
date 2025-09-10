@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: "frame-ancestors 'self' https://checkout.paystack.com https://js.paystack.co;"
+            value: "frame-ancestors 'self' https://checkout.paystack.com https://js.paystack.co; connect-src 'self' https://api.paystack.co https://real-estate-4391.onrender.com;"
           }
         ],
       },
