@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic"
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
@@ -17,7 +17,7 @@ import api from "@/lib/api"
 
 const images = ["/images/2d3.jpeg", "/images/2d2.jpeg", "/images/2d12.jpeg", "/images/2d13.jpeg", "/images/house8.jpeg"]
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
     const [formData, setFormData] = useState({
         newPassword: "",
         confirmPassword: "",
@@ -323,5 +323,51 @@ export default function ResetPasswordPage() {
                 </div>
             </div>
         </AuthGuard>
+    )
+}
+
+function LoadingFallback() {
+    return (
+        <AuthGuard requireAuth={false}>
+            <div className="min-h-screen grid md:grid-cols-2">
+                {/* Carousel Section */}
+                <div className="relative hidden md:block overflow-hidden">
+                    <div className="hidden md:flex md:w-1/2 relative">
+                    </div>
+                    <div className="relative z-10 flex flex-col justify-center items-center mt-6 text-center px-8 text-white">
+                        <Building2 className="h-40 w-40 mb-2.5 text-white-500" />
+                        <h1 className="text-4xl font-bold mb-4">Welcome to RentEase</h1>
+                        <p className="text-lg max-w-md">
+                            Find your perfect home or manage your properties with ease.
+                        </p>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30" />
+                </div>
+
+                {/* Right side - Loading */}
+                <div className="flex-1 flex items-center justify-center bg-gray-800 p-6">
+                    <Card className="w-full max-w-md bg-gray-800/90 text-white rounded-2xl shadow-lg">
+                        <CardHeader className="text-center">
+                            <div className="flex items-center justify-center space-x-2 mb-4">
+                                <Building2 className="h-8 w-8 text-blue-500" />
+                                <span className="text-2xl font-bold">RentEase</span>
+                            </div>
+                            <CardTitle className="text-2xl">Loading...</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        </AuthGuard>
+    )
+}
+
+export default function ResetPasswordPage() {
+    return (
+        <Suspense fallback={<LoadingFallback />}>
+            <ResetPasswordForm />
+        </Suspense>
     )
 }

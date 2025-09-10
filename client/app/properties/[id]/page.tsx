@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useAppDispatch, useAppSelector } from "@/hooks/redux"
 import { fetchPropertyById } from "@/store/slices/propertySlice"
@@ -14,7 +14,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import api from "@/lib/api"
 import { MapPin, Calendar, DollarSign, User, Phone, Mail, FileText, ArrowLeft, MessageSquare } from "lucide-react"
 
-export default function PropertyDetailPage() {
+function PropertyDetailForm() {
   const params = useParams()
   const router = useRouter()
   const dispatch = useAppDispatch()
@@ -293,5 +293,34 @@ export default function PropertyDetailPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="h-96 bg-gray-200 rounded-lg"></div>
+            <div className="space-y-4">
+              <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function PropertyDetailPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <PropertyDetailForm />
+    </Suspense>
   )
 }

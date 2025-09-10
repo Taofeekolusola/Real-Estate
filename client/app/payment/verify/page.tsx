@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useAppDispatch, useAppSelector } from "@/hooks/redux"
 import { verifyPayment } from "@/store/slices/paymentSlice"
@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { CheckCircle, XCircle, Loader2, ArrowRight } from "lucide-react"
 import { Payment } from "@/types"
 
-export default function PaymentVerificationPage() {
+function PaymentVerificationForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const dispatch = useAppDispatch()
@@ -118,5 +118,35 @@ export default function PaymentVerificationPage() {
         </Card>
       </div>
     </div>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Payment Verification</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8">
+              <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Loading...</h3>
+              <p className="text-gray-600">Please wait while we load the verification page...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
+
+export default function PaymentVerificationPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <PaymentVerificationForm />
+    </Suspense>
   )
 }
