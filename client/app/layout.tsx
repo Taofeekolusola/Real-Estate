@@ -57,7 +57,7 @@ export default function RootLayout({
       <head>
         <meta
           httpEquiv="Content-Security-Policy"
-          content="frame-ancestors 'self' https://checkout.paystack.com https://js.paystack.co;"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.paystack.co; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.paystack.co;"
         />
         <meta name="referrerPolicy" content="origin-when-cross-origin" />
       </head>

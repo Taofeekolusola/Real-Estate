@@ -22,6 +22,14 @@ app.use(rateLimit({
   max: 100,
 }));
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
 
 // Auth Routes
 const authRoutes = require("./routes/auth.routes");
