@@ -34,12 +34,13 @@ export default function ForgotPasswordPage() {
         setError("")
 
         try {
+            // Call the backend to get a reset token (but we won't send email)
             const response = await api.post("/auth/request-reset", { email })
-            // Redirect to reset password page with the token
             const { token } = response.data
+            // Redirect to reset password page with the token
             router.push(`/reset-password?token=${token}`)
         } catch (error: any) {
-            setError(error.response?.data?.message || "Failed to send reset link. Please try again.")
+            setError(error.response?.data?.message || "Failed to proceed with password reset. Please try again.")
         } finally {
             setIsLoading(false)
         }
@@ -84,7 +85,7 @@ export default function ForgotPasswordPage() {
                             </div>
                             <CardTitle className="text-2xl">Forgot Password?</CardTitle>
                             <CardDescription className="text-gray-400">
-                                Enter your email address and we'll send you a link to reset your password
+                                Enter your email address to proceed with password reset
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -111,7 +112,7 @@ export default function ForgotPasswordPage() {
                                 </div>
 
                                 <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isLoading}>
-                                    {isLoading ? "Sending..." : "Send Reset Link"}
+                                    {isLoading ? "Processing..." : "Reset Password"}
                                 </Button>
                             </form>
 

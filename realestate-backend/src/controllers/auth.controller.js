@@ -64,23 +64,23 @@ exports.updateUserProfile = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, email, phone, password, role, nin, bvn } = req.body;
-    
+
     // Ensures name is provided ad that it's a string
-    if (!name || typeof name !== 'string') { 
+    if (!name || typeof name !== 'string') {
       return res.status(400).json({
         message: 'Invalid name. Name is required and it must be a string.'
       });
     }
-    
+
     // Ensures email is provided ad that it's a string and contains '@'
-    if (!email || typeof email!== 'string' ||!email.includes('@')) { 
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
       return res.status(400).json({
         message: 'Invalid email. Email is required and it must be a valid email address.'
       });
     }
-    
+
     // Ensures password is provided ad that it's a string and at least 8 characters long
-    if (!password || typeof password!== 'string' || password.length < 8) { 
+    if (!password || typeof password !== 'string' || password.length < 8) {
       return res.status(400).json({
         message: 'Invalid password. Password is required and it must be at least 8 characters long.'
       });
@@ -89,7 +89,7 @@ exports.updateUserProfile = async (req, res) => {
     if (!["tenant", "landlord"].includes(role)) {
       return res.status(400).json({ message: "Invalid role" });
     }
-    
+
     // Fetch the user by ID
     const user = await User.findByPk(id);
 
@@ -204,17 +204,17 @@ exports.requestPasswordReset = async (req, res) => {
     // Generate a reset token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-    // Construct the reset link
+    // Construct the reset link (for reference, but not used)
     const resetLink = `http://localhost:5002/auth/reset/${token}`;
 
-    // Send the reset link to the user's email
-    await sendEmail(user.email, resetLink);
+    // Skip email sending - just return the token
+    // await sendEmail(user.email, resetLink);
 
     res.json({
-  message: "Password reset link sent to your email",
-  token,       // 👈 add this
-  resetLink    // 👈 add this
-});
+      message: "Password reset token generated successfully",
+      token,       // 👈 add this
+      resetLink    // 👈 add this
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -1,7 +1,8 @@
 //"https://real-estate-4391.onrender.com/api"
+//http://localhost:5000/api
 import axios, { InternalAxiosRequestConfig } from "axios";
 
-const API_BASE_URL = "http://localhost:5000/api"
+const API_BASE_URL = "https://real-estate-4391.onrender.com/api"
 
 // Create axios instance
 const api = axios.create({
